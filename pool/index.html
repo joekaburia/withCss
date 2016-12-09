@@ -1,0 +1,411 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Nearby Services Finder</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" />
+		<!--<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css" />-->
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+		<link rel="stylesheet" href="vendor/waves/waves.min.css" />
+		<link rel="stylesheet" href="vendor/wow/animate.css" />
+		<link rel="stylesheet" href="css/nativedroid2.css" />
+
+		<meta name="mobile-web-app-capable" content="yes">
+	 	<meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<script>
+    var xmlhttp; 
+	
+    window.onload = function() 
+	{ 
+	//document.addEventListener('deviceready', init, false); 
+	xmlhttp = new XMLHttpRequest(); 
+	xmlhttp.onreadystatechange = processRestaurant;
+
+xmlhttp = new XMLHttpRequest(); 
+	xmlhttp.onreadystatechange = processSchool;	
+	} 
+	function getLocation() 
+	{ 
+	var options = { 
+	enableHighAccuracy: true, 
+	timeout: 5000,  
+	maximumAge: 0 
+	}; 
+	navigator.geolocation.getCurrentPosition(successes, failures, options);
+	}
+	
+	  function successes(position) 
+	  { 
+	  var latitude = position.coords.latitude; 
+	  var long = position.coords.longitude; 
+	  var googleURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=AIzaSyAwH5F7MxOgNRXDcesHJDebSmmdJb_iwBk&location="; 
+	  googleURL += latitude + "," + long; 
+	  googleURL += "&rankby=distance&keyword=atm"; 
+	  getRestaurantList(googleURL);                     
+	  } 
+
+	  function getRestaurantList(URL) 
+	  { 
+	  xmlhttp.open("GET", URL, true); 
+	  xmlhttp.send(); 
+	  } 
+	  
+	  function processRestaurant() 
+	  { 
+
+	  var out="<ul data-role='listview' data-inset='true' id='restList'>";  
+	  if(xmlhttp.readyState == 4 && xmlhttp.status==200) 
+	  { 
+	  var restaurantXML = $.parseXML(xmlhttp.responseText); 
+	  var xml = $(restaurantXML); 
+	  console.log(xml); 
+	  $(xml).find("result").each(function(){ 
+	  var name = $(this).find('name').text(); 
+	  var address = $(this).find('vicinity').text(); 
+	  var rating = $(this).find('rating').text(); 
+	  var open = $(this).find('opening_hours').find('open_now'). text();
+	  
+	  var lat = $(this).find('geometry').find('location').find('lat').text();
+	  var lng = $(this).find('geometry').find('location').find('lng').text();
+	  
+	   out += "<li data-role='list-divider'> <a href='https://www.google.com/maps/@lat,lng' data-transition=''><div style='background: ; color:black;'<h1>"; 
+	   
+	   out += name + "</h1></div></a></li>"; 
+	   out += "<li>" + address; 
+	   out += "<p>Google Rating: " + rating + "</p>"; 
+	   if(open){ 
+	   out += "<p class='ul-li-aside'>Open Now!</p>"; 
+	   } 
+	   out += "</li>"; 
+	   }); 
+	   } 
+	   out += "</ul>";
+	   document.getElementById('result').innerHTML = "<h1>Restaurants Nearby</h1>"; 
+	   document.getElementById('result').innerHTML = out; 
+	   $("#restList").listview().listview('refresh');   
+	   
+	   }
+
+	   function failures(message) 
+	   { 
+	   alert("Error:" + message.message); 
+	   } 
+	   
+	   function getSchools() 
+	{ 
+	var options = { 
+	enableHighAccuracy: true, 
+	timeout: 5000,  
+	maximumAge: 0 
+	}; 
+	navigator.geolocation.getCurrentPosition(success, failure, options);
+	}
+	
+	   
+	   function success(position) 
+	  { 
+	  var latitude = position.coords.latitude; 
+	  var long = position.coords.longitude; 
+	  var googleURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=AIzaSyAwH5F7MxOgNRXDcesHJDebSmmdJb_iwBk&location="; 
+	  googleURL += latitude + "," + long; 
+	  googleURL += "&rankby=distance&keyword=school"; 
+	  getSchoolList(googleURL);                     
+	  } 
+
+	  function getSchoolList(URL) 
+	  { 
+	  xmlhttp.open("GET", URL, true); 
+	  xmlhttp.send(); 
+	  } 
+	  
+	  function processSchool() 
+	  { 
+
+	  var out="<ul data-role='listview' data-inset='true' id='restList'>";  
+	  if(xmlhttp.readyState == 4 && xmlhttp.status==200) 
+	  { 
+	  var restaurantXML = $.parseXML(xmlhttp.responseText); 
+	  var xml = $(restaurantXML); 
+	  console.log(xml); 
+	  $(xml).find("result").each(function(){ 
+	  var name = $(this).find('name').text(); 
+	  var address = $(this).find('vicinity').text(); 
+	 
+	  var open = $(this).find('opening_hours').find('open_now'). text();
+	  
+	  var lat = $(this).find('geometry').find('location').find('lat').text();
+	  var lng = $(this).find('geometry').find('location').find('lng').text();
+	  
+	   out += "<li data-role='list-divider'> <a href='https://www.google.com/maps/@lat,lng' data-transition=''><div style='background: ; color:black;'<h3>"; 
+	   
+	   out += name + "</h3></div></a></li>"; 
+	   out += "<li>" + address; 
+	    
+	   if(open){ 
+	   out += "<p class='ul-li-aside'>Open Now!</p>"; 
+	   } 
+	   out += "</li>"; 
+	   }); 
+	   } 
+	   out += "</ul>";
+	   document.getElementById('result').innerHTML = "<h1>Restaurants Nearby</h1>"; 
+	   document.getElementById('result').innerHTML = out; 
+	   $("#restList").listview().listview('refresh');   
+	   
+	   }
+	   	   function failure(message) 
+	   { 
+	   alert("Error:" + message.message); 
+	   } 
+
+	   
+	   function clearScreen() 
+	   { 
+	   document.getElementById('result').innerHTML = ""; 
+	   }
+	   
+   </script>
+	    <script>
+      // This example requires the Places library. Include the libraries=places
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+      var map;
+      var infowindow;
+
+      function initMap() {
+        var pyrmont = {lat: 5.75, lng: -0.219555};
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: pyrmont,
+          zoom: 15
+        });
+
+        infowindow = new google.maps.InfoWindow();
+        var service = new google.maps.places.PlacesService(map);
+        service.nearbySearch({
+          location: pyrmont,
+          radius: 5000,
+          type: ['ATM']
+        }, callback);
+      }
+
+      function callback(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+          }
+        }
+      }
+
+      function createMarker(place) {
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(place.name);
+          infowindow.open(map, this);
+        });
+      }
+    </script>
+
+	</head>
+	<body>
+	<div data-role="page" id="login">
+
+
+			<div data-role="header" data-position="fixed" class="wow fadeInDown" data-wow-delay="0.2s">
+			
+				<h1 class="wow fadeIn" >Places Finder</h1>
+			</div>
+
+			<div role="main" class="ui-content" data-inset="false" id="main" style="height:100%, width:100%">
+				<form>
+				<div class="col-xs-12 col-sm-6 col-md-4">
+						<div class="box">
+
+                        <input type="email" name="inputEmail" id="inputEmail" value="" data-clear-btn="true" placeholder="username or email" required>
+
+                        <input type="password" name="name2" id="name2b" value="" data-clear-btn="true" placeholder="password" required>
+						<div ><a href="#first" class="ui-btn ui-btn-raised clr-primary" >Login</a></div>
+						<br>
+						</br>
+						<div <a href="#first" class="ui-btn ui-btn-raised clr-primary" >Register</a></div>
+				<div id="mapCanvas" ></div>
+                        
+
+                            </div>
+
+
+
+                            
+				</form>
+				</div>
+
+				<!--Footer-->
+
+			
+			
+
+
+
+
+							
+
+		</div>
+		</div>
+
+		<div data-role="page" id="landingPage" style="background: white">
+
+			<nd2-include data-src="examples/fragments/panel.left.html"></nd2-include>
+
+			<div data-role="panel" id="bottomsheet" data-animate="false" data-position='bottom' data-display="overlay">
+				<nd2-include data-src="examples/fragments/bottom.sheet.html"></nd2-include>
+			</div>
+
+			<div data-role="header" data-position="fixed" class="wow fadeInDown" data-wow-delay="0.2s">
+				<a href="#bottomsheet" class="ui-btn ui-btn-right wow fadeIn" data-wow-delay='1.2s'><i class="zmdi zmdi-more-vert"></i></a>
+				<a href="#leftpanel" class="ui-btn ui-btn-left wow fadeIn" data-wow-delay='0.8s'><i class="zmdi zmdi-menu"></i></a>
+				<h1 class="wow fadeIn" data-wow-delay='0.4s'>My Places</h1>
+			</div>
+
+			<div role="main" class="ui-content" data-inset="false" id="main" style="height:100%, width:100%">
+				<!--<p>Map</p>-->
+				<div id="barcodeScanner"><a href="#first" class="ui-btn ui-btn-raised clr-primary" onClick="scanner();">Second Page</a></div>
+				<div id="mapCanvas" ></div>
+			</div>
+			
+			<div role="main" class="ui-content" data-inset="false" id="main" style="height:100%, width:100%">
+				<!--<p>Map</p>-->
+				<div id="barcodeScanner"><a href="#third" class="ui-btn ui-btn-raised clr-primary" onClick="scanner();">Scanner</a></div>
+				<div id="mapCanvas" ></div>
+			</div>
+			</div>
+			
+			
+			<div data-role="page" id="third" style="background : transparent; height:0%">
+
+			
+
+			
+
+			
+			</div>
+			
+			<div data-role="page" id="first">
+
+			<nd2-include data-src="examples/fragments/panel.left.html"></nd2-include>
+
+			<div data-role="panel" id="bottomsheet" data-animate="false" data-position='bottom' data-display="overlay">
+				<nd2-include data-src="examples/fragments/bottom.sheet.html"></nd2-include>
+			</div>
+
+			<div data-role="header" data-position="fixed" class="wow fadeInDown" data-wow-delay="0.2s">
+			
+				<a href="#leftpanel" class="ui-btn ui-btn-left wow fadeIn" data-wow-delay='0.8s'><i class="zmdi zmdi-menu"></i></a>
+				<h1 class="wow fadeIn" data-wow-delay='0.4s'>Places Finder</h1>
+			</div>
+
+			
+   
+ <div id="container"> 
+ <button id="btnGetLocation" onclick="getLocation()">Nearby Restaurants</button> 
+ <button id="btnGetLocation" onclick="getSchools()">Nearby Schools</button> 
+ <a href="places.html" data-transition="pop">
+ <button  >I'm Hungry</button> </a>
+ <button id="btnClear" onclick="clearScreen()">Clear</button> 
+ <div id="result"></div>
+ </div>
+ </div>
+
+			
+			
+			
+			<div data-role="page" id="second" style="background: white">
+
+			<nd2-include data-src="examples/fragments/panel.left.html"></nd2-include>
+
+			<div data-role="panel" id="bottomsheet" data-animate="false" data-position='bottom' data-display="overlay">
+				<nd2-include data-src="examples/fragments/bottom.sheet.html"></nd2-include>
+			</div>
+
+			<div data-role="header" data-position="fixed" class="wow fadeInDown" data-wow-delay="0.2s">
+			
+				<a href="#leftpanel" class="ui-btn ui-btn-left wow fadeIn" data-wow-delay='0.8s'><i class="zmdi zmdi-menu"></i></a>
+				<h1 class="wow fadeIn" data-wow-delay='0.4s'>I'm Hungry</h1>
+			</div>
+
+			<div data-role="content" style="text-shadow: none;  id="map">
+			
+				
+				
+
+  <iframe
+width="750"
+height ="550"
+frameborder="0" style="border
+
+src="https://maps.googleapis.com/maps/embed/v1/directions?key=AIzaSyB-4p5UjhQbt2WmM_Fj7XREK-m6gFcMYS4&origin=accra&destination=kumasi" allowfullscreen>
+
+	</iframe>
+	
+				
+			</div><!-- /content -->
+				
+			
+			
+			</div>
+			
+
+			
+
+			<div data-role="footer" data-position="fixed">
+
+				<div class="row center-xs">
+					<div class="col-xs-4">
+						<div class="box">
+							<a href="#" class="ui-btn ui-mini nd2-btn-icon-block"><i class='zmdi zmdi-edit'></i> edit</a>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="box">
+							<a href="#" class="ui-btn ui-mini nd2-btn-icon-block"><i class='zmdi zmdi-plus'></i> News</a>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="box">
+							<a href="#" class="ui-btn ui-mini nd2-btn-icon-block"><i class='zmdi zmdi-minus'></i> remove</a>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+
+
+
+							
+
+		</div>
+		<script src="js/script.js"></script>
+		<script src="cordova.js"></script>
+		<!--<script src="js/nativedroid2.js"></script>
+
+		 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPflJXFtDl_8_ip9OqwxVdld7Bwdkp-go&callback=initMap"
+    async defer></script>-->
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+		<script src="vendor/waves/waves.min.js"></script>
+		<script src="vendor/wow/wow.min.js"></script>
+		<script src="js/nativedroid2.js"></script>
+		<script src="nd2settings.js"></script>
+
+	</body>
+</html>
