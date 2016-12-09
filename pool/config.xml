@@ -116,8 +116,9 @@
     <splash src="res/screens/windows/SplashScreenPhone.scale-240.png" width="1152" height="1920"/>
   </platform>
 
+ 
   <platform name="wp8">
-    <splash src="/img/mymap.png" width="768" height="1280"/>
+    <splash src="img/mymap.png" width="768" height="1280"/>
   </platform>
   <plugin name="cordova-plugin-camera"  />
   <plugin name="cordova-plugin-media-capture" />
